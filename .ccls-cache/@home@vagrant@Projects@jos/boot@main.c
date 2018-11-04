@@ -1,5 +1,5 @@
-#include <inc/x86.h>
 #include <inc/elf.h>
+#include <inc/x86.h>
 
 /**********************************************************************
  * This a dirt simple boot loader, whose sole job is to boot
@@ -30,7 +30,7 @@
  **********************************************************************/
 
 #define SECTSIZE 512
-#define ELFHDR ((struct Elf *)0x10000)  // scratch space
+#define ELFHDR ((struct Elf *)0x10000) // scratch space
 
 void readsect(void *, uint32_t);
 void readseg(uint32_t, uint32_t, uint32_t);
@@ -42,7 +42,8 @@ void bootmain(void) {
   readseg((uint32_t)ELFHDR, SECTSIZE * 8, 0);
 
   // is this a valid ELF?
-  if (ELFHDR->e_magic != ELF_MAGIC) goto bad;
+  if (ELFHDR->e_magic != ELF_MAGIC)
+    goto bad;
 
   // load each program segment (ignores ph flags)
   ph = (struct Proghdr *)((uint8_t *)ELFHDR + ELFHDR->e_phoff);
@@ -59,7 +60,8 @@ void bootmain(void) {
 bad:
   outw(0x8A00, 0x8A00);
   outw(0x8A00, 0x8E00);
-  while (1) /* do nothing */;
+  while (1) /* do nothing */
+    ;
 }
 
 // Read 'count' bytes at 'offset' from kernel into physical address 'pa'.
@@ -90,19 +92,20 @@ void readseg(uint32_t pa, uint32_t count, uint32_t offset) {
 
 void waitdisk(void) {
   // wait for disk reaady
-  while ((inb(0x1F7) & 0xC0) != 0x40) /* do nothing */;
+  while ((inb(0x1F7) & 0xC0) != 0x40) /* do nothing */
+    ;
 }
 
 void readsect(void *dst, uint32_t offset) {
   // wait for disk to be ready
   waitdisk();
 
-  outb(0x1F2, 1);  // count = 1
+  outb(0x1F2, 1); // count = 1
   outb(0x1F3, offset);
   outb(0x1F4, offset >> 8);
   outb(0x1F5, offset >> 16);
   outb(0x1F6, (offset >> 24) | 0xE0);
-  outb(0x1F7, 0x20);  // cmd 0x20 - read sectors
+  outb(0x1F7, 0x20); // cmd 0x20 - read sectors
 
   // wait for disk to be ready
   waitdisk();
@@ -110,4 +113,3 @@ void readsect(void *dst, uint32_t offset) {
   // read a sector
   insl(0x1F0, dst, SECTSIZE / 4);
 }
-

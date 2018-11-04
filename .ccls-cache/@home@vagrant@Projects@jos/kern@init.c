@@ -5,9 +5,6 @@
 #include <inc/string.h>
 
 #include <kern/console.h>
-#include <kern/pmap.h>
-#include <kern/kclock.h>
-
 #include <kern/monitor.h>
 
 // Test the stack backtrace function (lab 1 only)
@@ -34,13 +31,12 @@ void i386_init(void) {
 
   cprintf("6828 decimal is %o octal!\n", 6828);
 
-  // Lab 2 memory management initialization functions
-  mem_init();
   // Test the stack backtrace function (lab 1 only)
   test_backtrace(5);
 
   // Drop into the kernel monitor.
-  while (1) monitor(NULL);
+  while (1)
+    monitor(NULL);
 }
 
 /*
@@ -56,7 +52,8 @@ const char *panicstr;
 void _panic(const char *file, int line, const char *fmt, ...) {
   va_list ap;
 
-  if (panicstr) goto dead;
+  if (panicstr)
+    goto dead;
   panicstr = fmt;
 
   // Be extra sure that the machine is in as reasonable state
@@ -70,7 +67,8 @@ void _panic(const char *file, int line, const char *fmt, ...) {
 
 dead:
   /* break into the kernel monitor */
-  while (1) monitor(NULL);
+  while (1)
+    monitor(NULL);
 }
 
 /* like panic, but don't */
